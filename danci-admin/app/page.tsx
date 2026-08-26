@@ -1,7 +1,9 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { getCurrentAdmin, hasAnyAdmin } from "@/lib/auth.server";
+
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const cookieStore = await cookies();
-  redirect(cookieStore.has("ciyu-admin-auth") ? "/books" : "/signin");
+  if (!(await hasAnyAdmin())) redirect("/signup");
+  redirect((await getCurrentAdmin()) ? "/books" : "/signin");
 }

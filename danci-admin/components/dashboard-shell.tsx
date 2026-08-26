@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { BrandMark } from "@/components/brand-mark";
 import { Button } from "@/components/ui/button";
-import { clearBrowserAuth } from "@/lib/auth";
+import type { CurrentAdmin } from "@/lib/auth.server";
 import { cn } from "@/lib/utils";
 
 const navigation = [
@@ -24,14 +24,20 @@ const navigation = [
   { href: "/admin-users", label: "管理员管理", description: "成员与权限", icon: UsersRound },
 ];
 
-function SidebarContent({ email, onNavigate }: { email: string; onNavigate?: () => void }) {
+function SidebarContent({ admin, onNavigate }: { admin: CurrentAdmin; onNavigate?: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
+  const visibleNavigation = navigation.filter(
+    (item) => item.href !== "/admin-users" || admin.role === "system_admin",
+  );
 
-  function logout() {
-    clearBrowserAuth();
-    router.replace("/signin");
-    router.refresh();
+  async function logout() {
+    try {
+      await fetch("/api/auth/signout", { method: "POST" });
+    } finally {
+      router.replace("/signin");
+      router.refresh();
+    }
   }
 
   return (
@@ -48,7 +54,7 @@ function SidebarContent({ email, onNavigate }: { email: string; onNavigate?: () 
 
       <nav className="flex-1 space-y-1.5 overflow-y-auto px-3 py-6" aria-label="后台导航">
         <p className="mb-3 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/30">内容管理</p>
-        {navigation.map((item) => {
+        {visibleNavigation.map((item) => {
           const active = pathname === item.href;
           return (
             <Link
@@ -82,11 +88,13 @@ function SidebarContent({ email, onNavigate }: { email: string; onNavigate?: () 
       <div className="m-3 rounded-2xl border border-white/[0.07] bg-white/[0.035] p-3">
         <div className="flex items-center gap-3">
           <div className="grid size-9 shrink-0 place-items-center rounded-xl bg-[#ffb8aa] text-sm font-semibold text-[#6d231d]">
-            {email.slice(0, 1).toUpperCase()}
+            {admin.name.slice(0, 1).toUpperCase()}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium text-white">系统管理员</p>
-            <p className="mt-1 truncate text-[10px] text-white/35" title={email}>{email}</p>
+            <p className="truncate text-xs font-medium text-white">{admin.name}</p>
+            <p className="mt-1 truncate text-[10px] text-white/35" title={admin.email}>
+              {admin.role === "system_admin" ? "系统管理员" : "普通管理员"} · {admin.email}
+            </p>
           </div>
           <Button
             type="button"
@@ -105,7 +113,7 @@ function SidebarContent({ email, onNavigate }: { email: string; onNavigate?: () 
   );
 }
 
-export function DashboardShell({ email, children }: { email: string; children: React.ReactNode }) {
+export function DashboardShell({ admin, children }: { admin: CurrentAdmin; children: React.ReactNode }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const current = navigation.find((item) => item.href === pathname);
@@ -113,7 +121,7 @@ export function DashboardShell({ email, children }: { email: string; children: R
   return (
     <div className="min-h-screen bg-[#f7f7f9] lg:grid lg:grid-cols-[252px_minmax(0,1fr)]">
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-[252px] bg-[#191b25] lg:block">
-        <SidebarContent email={email} />
+        <SidebarContent admin={admin} />
       </aside>
 
       {mobileOpen ? (
@@ -123,7 +131,7 @@ export function DashboardShell({ email, children }: { email: string; children: R
             <button onClick={() => setMobileOpen(false)} className="absolute right-3 top-3 z-10 grid size-9 place-items-center rounded-lg text-white/50 hover:bg-white/10 hover:text-white" aria-label="关闭导航">
               <X className="size-5" />
             </button>
-            <SidebarContent email={email} onNavigate={() => setMobileOpen(false)} />
+            <SidebarContent admin={admin} onNavigate={() => setMobileOpen(false)} />
           </aside>
         </div>
       ) : null}

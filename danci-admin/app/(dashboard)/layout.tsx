@@ -1,18 +1,12 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { DashboardShell } from "@/components/dashboard-shell";
+import { hasAnyAdmin, requireAdmin } from "@/lib/auth.server";
+
+export const dynamic = "force-dynamic";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const cookieStore = await cookies();
-  if (!cookieStore.has("ciyu-admin-auth")) redirect("/signin");
+  if (!(await hasAnyAdmin())) redirect("/signup");
+  const admin = await requireAdmin();
 
-  const rawEmail = cookieStore.get("ciyu-admin-email")?.value || "admin@ciyu.cn";
-  let email = rawEmail;
-  try {
-    email = decodeURIComponent(rawEmail);
-  } catch {
-    email = "admin@ciyu.cn";
-  }
-
-  return <DashboardShell email={email}>{children}</DashboardShell>;
+  return <DashboardShell admin={admin}>{children}</DashboardShell>;
 }

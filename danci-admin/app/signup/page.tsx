@@ -1,12 +1,15 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AuthShell } from "@/components/auth-shell";
 import { SignupForm } from "@/components/signup-form";
+import { hasAnyAdmin } from "@/lib/auth.server";
+
+export const dynamic = "force-dynamic";
 
 export default async function SignupPage() {
-  if ((await cookies()).has("ciyu-admin-auth")) redirect("/books");
+  if (await hasAnyAdmin()) redirect("/signin");
+
   return (
-    <AuthShell title="创建管理员账号" description="填写基础信息，注册后即可进入管理后台。">
+    <AuthShell title="创建系统管理员" description="系统尚未初始化，请创建唯一的系统管理员账号。">
       <SignupForm />
     </AuthShell>
   );

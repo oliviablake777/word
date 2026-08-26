@@ -1,13 +1,11 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Info, LoaderCircle, LockKeyhole, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { setBrowserAuth } from "@/lib/auth";
 
 export function SigninForm() {
   const router = useRouter();
@@ -17,29 +15,44 @@ export function SigninForm() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  function fillDemo() {
-    setEmail("admin@ciyu.cn");
-    setPassword("admin123");
-    setError("");
-  }
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     if (!/^\S+@\S+\.\S+$/.test(email)) {
       setError("请输入有效的邮箱地址");
       return;
     }
-    if (password.length < 6) {
-      setError("密码至少需要 6 位");
+    if (password.length < 8) {
+      setError("密码至少需要 8 位");
       return;
     }
+
     setSubmitting(true);
-    window.setTimeout(() => {
-      setBrowserAuth(email);
+    try {
+      const response = await fetch("/api/auth/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const result = (await response.json()) as { error?: string; code?: string };
+
+      if (!response.ok) {
+        if (result.code === "SETUP_REQUIRED") {
+          router.replace("/signup");
+          router.refresh();
+          return;
+        }
+        setError(result.error || "登录失败，请稍后重试");
+        return;
+      }
+
       router.replace("/books");
       router.refresh();
-    }, 450);
+    } catch {
+      setError("无法连接服务器，请稍后重试");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -64,12 +77,7 @@ export function SigninForm() {
       </div>
 
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="password" className="text-xs font-bold tracking-wide text-black">密码</Label>
-          <button type="button" className="text-xs font-medium text-black/50 underline-offset-4 transition hover:text-black hover:underline">
-            忘记密码？
-          </button>
-        </div>
+        <Label htmlFor="password" className="text-xs font-bold tracking-wide text-black">密码</Label>
         <div className="relative">
           <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-black/50" />
           <Input
@@ -105,16 +113,8 @@ export function SigninForm() {
 
       <div className="flex items-start gap-2.5 border border-black/30 bg-[#fff7d3] p-3.5 text-xs leading-5 text-black/55">
         <Info className="mt-0.5 size-4 shrink-0 text-black" />
-        <p>
-          演示账号：<span className="font-semibold text-black">admin@ciyu.cn</span> / <span className="font-semibold text-black">admin123</span>
-          <button type="button" onClick={fillDemo} className="ml-2 font-bold text-black underline underline-offset-2">一键填入</button>
-        </p>
+        <p>登录状态由服务端安全保存，有效期为 7 天。退出登录后当前会话会立即失效。</p>
       </div>
-
-      <p className="pt-1 text-center text-sm text-black/55">
-        还没有管理员账号？
-        <Link href="/signup" className="ml-1 font-bold text-black underline decoration-1 underline-offset-4">立即注册</Link>
-      </p>
     </form>
   );
 }

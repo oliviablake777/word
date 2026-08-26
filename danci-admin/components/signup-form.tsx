@@ -1,13 +1,11 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, LoaderCircle, LockKeyhole, Mail, UserRound } from "lucide-react";
+import { Eye, EyeOff, Info, LoaderCircle, LockKeyhole, Mail, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { setBrowserAuth } from "@/lib/auth";
 
 export function SignupForm() {
   const router = useRouter();
@@ -19,23 +17,44 @@ export function SignupForm() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     if (name.trim().length < 2) return setError("姓名至少需要 2 个字符");
     if (!/^\S+@\S+\.\S+$/.test(email)) return setError("请输入有效的邮箱地址");
     if (password.length < 8) return setError("密码至少需要 8 位");
     if (password !== confirmPassword) return setError("两次输入的密码不一致");
+
     setSubmitting(true);
-    window.setTimeout(() => {
-      setBrowserAuth(email, name.trim());
+    try {
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+      const result = (await response.json()) as { error?: string; code?: string };
+
+      if (!response.ok) {
+        if (result.code === "SETUP_COMPLETED") {
+          router.replace("/signin");
+          router.refresh();
+          return;
+        }
+        setError(result.error || "注册失败，请稍后重试");
+        return;
+      }
+
       router.replace("/books");
       router.refresh();
-    }, 450);
+    } catch {
+      setError("无法连接服务器，请稍后重试");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   const fields = [
-    { id: "name", label: "姓名", type: "text", placeholder: "请输入管理员姓名", value: name, setValue: setName, icon: UserRound, autoComplete: "name" },
+    { id: "name", label: "姓名", type: "text", placeholder: "请输入系统管理员姓名", value: name, setValue: setName, icon: UserRound, autoComplete: "name" },
     { id: "email", label: "邮箱", type: "email", placeholder: "name@company.com", value: email, setValue: setEmail, icon: Mail, autoComplete: "email" },
   ];
 
@@ -95,18 +114,16 @@ export function SignupForm() {
         </div>
       </div>
 
-      <p className="text-xs leading-5 text-black/50">密码需包含至少 8 个字符。注册即表示你同意平台的使用规范与隐私政策。</p>
+      <div className="flex items-start gap-2 border border-black/30 bg-[#fff7d3] p-3 text-xs leading-5 text-black/55">
+        <Info className="mt-0.5 size-4 shrink-0 text-black" />
+        <span>该入口仅在数据库中没有管理员时开放，注册完成后将永久关闭。</span>
+      </div>
       {error && <p role="alert" className="border border-red-700 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
 
       <Button type="submit" size="lg" disabled={submitting} className="h-11 w-full rounded-none border border-black bg-black font-bold text-white shadow-[4px_4px_0_rgba(0,0,0,0.2)] hover:bg-black/85">
         {submitting ? <LoaderCircle className="size-4 animate-spin" /> : null}
-        {submitting ? "正在创建账号..." : "创建管理员账号"}
+        {submitting ? "正在创建账号..." : "创建系统管理员"}
       </Button>
-
-      <p className="pt-2 text-center text-sm text-black/55">
-        已经有管理员账号？
-        <Link href="/signin" className="ml-1 font-bold text-black underline decoration-1 underline-offset-4">返回登录</Link>
-      </p>
     </form>
   );
 }
