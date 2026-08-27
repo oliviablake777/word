@@ -114,3 +114,18 @@ ai 生成一个script 脚本，本地运行
 - 规则或规范，表单字段，业务场景，功能描述
   详细表达，不能让llm 去猜
 - llm 擅长的，比如生成代码，让它自己去跑。
+
+## 多端
+- PC 端
+  SEO办公
+- 客户端
+  - android
+  - ios
+  RN/flutter
+- 桌面端
+  C/S electron
+
+## h5 web 应用
+- nextjs 模版
+  不用从0开始开发
+- clear/compact 上下文
