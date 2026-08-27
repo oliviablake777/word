@@ -82,3 +82,35 @@ ORM 工具 一种 一系列的包和命令
   - migrate 数据库迁移
   - push 数据库推送
   - studio 数据库可视化工具
+
+## words 表
+github 下载 zip-> json 文件 (178kb)
+ 想创建一个words 表，导入这个数据？ json->sql/csv 直接导入数据库
+ ai 上下文 #json 转成csv 格式，字段...178kb token
+ ai 写一段格式转换脚本(1000 token),本地运行
+### 数据清晰
+- 常见的后端功能 
+scripts/
+  解决一些问题 爬虫、数据格式转换等等
+ai 来做？ 上下文比较大，上下文窗口限制的，token开销
+ai 生成一个script 脚本，本地运行
+- RLS
+  行安全 words 公共表没必要开启
+  而 每个用户的背单词记录 需要可开启
+- prompt执行上下文考虑
+  1. 给prompt 提供充足的上下文
+  数据表，技术架构，放在Agents.md 文件
+  2. 隐藏的上下文开销，不让AI 去读文件，给他文件的格式
+
+### 让ai 了解supabase 有books 表
+- 本地建schema
+- 后台图书业务
+## cascade 级联删除
+  外键声明后面加上
+  on delete cascade
+
+## Prompt 颗粒度
+- 上下文一定要准确且清晰
+- 规则或规范，表单字段，业务场景，功能描述
+  详细表达，不能让llm 去猜
+- llm 擅长的，比如生成代码，让它自己去跑。
