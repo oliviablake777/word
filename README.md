@@ -10,7 +10,7 @@ next.js 单词后台管理系统和h5 应用开发
 github 高星的 单词资料库 
 数据清洗 （选择、格式化、审核）
 - supabase 云端类psql数据库
-  关系型数据库
+  关系型数据库 
 - 支持向量数据库
 - 云端 BASS 数据库 
   Backend as a service 

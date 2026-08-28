@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400">
+  <rect width="300" height="400" rx="28" fill="#E8DDF3"/>
+  <path d="M0 270c71-37 128 35 192-8 44-29 75-17 108 5v133H0V270Z" fill="#7356A3"/>
+  <rect x="42" y="54" width="216" height="116" rx="20" fill="#FCFBF4" stroke="#17201D" stroke-width="4"/>
+  <path d="M66 83h128M66 106h169M66 129h94" stroke="#17201D" stroke-width="5" stroke-linecap="round"/>
+  <text x="42" y="235" font-family="Arial,sans-serif" font-size="58" font-weight="800" fill="#17201D">CORE</text>
+  <text x="45" y="275" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="#17201D">VOCABULARY</text>
+</svg>

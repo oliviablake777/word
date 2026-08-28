@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400">
+  <rect width="300" height="400" rx="28" fill="#B9DDCF"/>
+  <path d="M0 304c58-45 113-2 158-32 60-41 91-32 142-8v136H0v-96Z" fill="#2D6D64"/>
+  <circle cx="75" cy="82" r="42" fill="#F6D86B" stroke="#17201D" stroke-width="4"/>
+  <path d="M44 164h205M44 185h128" stroke="#17201D" stroke-width="5" stroke-linecap="round"/>
+  <text x="42" y="254" font-family="Arial,sans-serif" font-size="58" font-weight="800" fill="#17201D">HELLO</text>
+  <text x="44" y="288" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="#17201D">GRADE 6</text>
+  <path d="M52 84h46M75 61v46" stroke="#17201D" stroke-width="4" stroke-linecap="round"/>
+</svg>
