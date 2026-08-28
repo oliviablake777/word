@@ -129,3 +129,4 @@ ai 生成一个script 脚本，本地运行
 - nextjs 模版
   不用从0开始开发
 - clear/compact 上下文
+  新项目重新启动新的对话窗口
