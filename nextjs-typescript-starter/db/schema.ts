@@ -13,9 +13,7 @@ import type { WordContent } from '@/lib/mock-data';
  * schema; it does not create or migrate database tables.
  */
 export const books = pgTable('books', {
-  id: bigint('id', { mode: 'bigint' })
-    .primaryKey()
-    .generatedByDefaultAsIdentity(),
+  id: bigint('id', { mode: 'bigint' }).primaryKey(),
   title: text('title').notNull(),
   wordCount: integer('wordCount').notNull(),
   coverUrl: text('coverUrl').notNull(),
@@ -24,9 +22,7 @@ export const books = pgTable('books', {
 });
 
 export const words = pgTable('words', {
-  id: bigint('id', { mode: 'bigint' })
-    .primaryKey()
-    .generatedByDefaultAsIdentity(),
+  id: bigint('id', { mode: 'bigint' }).primaryKey(),
   wordRank: integer('wordRank'),
   headWord: text('headWord'),
   content: json('content').$type<WordContent>(),
